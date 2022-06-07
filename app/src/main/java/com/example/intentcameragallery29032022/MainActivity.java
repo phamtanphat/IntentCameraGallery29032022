@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100) {
+        if (requestCode == 100 && resultCode == RESULT_OK ) {
+
             Bitmap captureImage = (Bitmap) data.getExtras().get("data");
             binding.imageView.setImageBitmap(captureImage);
         }
-
     }
 }
