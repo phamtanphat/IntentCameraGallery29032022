@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     private static int RESULT_LOAD_IMAGE = 1;
+    private static int RESULT_CAMERA = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,100);
+                startActivityForResult(intent,RESULT_CAMERA);
                 Toast.makeText(MainActivity.this, "Camera", Toast.LENGTH_SHORT).show();
             }
         });
@@ -57,13 +58,13 @@ public class MainActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{
                     Manifest.permission.CAMERA
-            },100);
+            },RESULT_CAMERA);
         }
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 && resultCode == RESULT_OK ) {
+        if (requestCode == RESULT_CAMERA && resultCode == RESULT_OK ) {
 
             Bitmap captureImage = (Bitmap) data.getExtras().get("data");
             binding.imageView.setImageBitmap(captureImage);
