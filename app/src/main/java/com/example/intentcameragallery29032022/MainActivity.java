@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap captureImage = (Bitmap) data.getExtras().get("data");
             binding.imageView.setImageBitmap(captureImage);
         }
-        if (resultCode == RESULT_OK) {
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
             try {
                 final Uri imageUri = data.getData();
                 final InputStream imageStream = getContentResolver().openInputStream(imageUri);
