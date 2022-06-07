@@ -10,6 +10,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -17,10 +19,13 @@ import android.widget.Toast;
 
 import com.example.intentcameragallery29032022.databinding.ActivityMainBinding;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-
+    private static int RESULT_LOAD_IMAGE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, RESULT_LOAD_IMAGE);
                 Toast.makeText(MainActivity.this, "Camera", Toast.LENGTH_SHORT).show();
             }
         });
@@ -59,6 +67,16 @@ public class MainActivity extends AppCompatActivity {
 
             Bitmap captureImage = (Bitmap) data.getExtras().get("data");
             binding.imageView.setImageBitmap(captureImage);
+        }
+        if (resultCode == RESULT_OK) {
+            try {
+                final Uri imageUri = data.getData();
+                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                binding.imageView.setImageBitmap(selectedImage);
+            } catch (FileNotFoundException e) {
+            }
+
         }
     }
 }
