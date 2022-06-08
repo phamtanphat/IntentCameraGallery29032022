@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.example.intentcameragallery29032022.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_ID_READ_WRITE_PERMISSION = 100;
     ActivityMainBinding binding;
     int REQUEST_CODE_CAMERA = 1;
     @Override
@@ -63,7 +66,58 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+private void  askPermissionAndCaptur(){
+        if (Build.VERSION.SDK_INT>=23){
+            int read = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int write = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            // kiem tra quyen doc vaf ghi cua ung dung
+        }
+        if (android.R.attr.writePermission!= PackageManager.PERMISSION_GRANTED || android.R.attr.readPermission!= PackageManager.PERMISSION_GRANTED){
+            this.requestPermissions(new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE || Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_ID_READ_WRITE_PERMISSION)
+            });
+        }
+}
+    private void captureVideo() {
+        try {
+            // Create an implicit intent, for video capture.
+            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
+            // The external storage directory.
+            File dir = Environment.getExternalStorageDirectory();
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            // file:///storage/emulated/0/myvideo.mp4
+            String savePath = dir.getAbsolutePath() + "/myvideo.mp4";
+            File videoFile = new File(savePath);
+            Uri videoUri = Uri.fromFile(videoFile);
+
+            // Specify where to save video files.
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // ================================================================================================
+            // To Fix Error (**)
+            // ================================================================================================
+
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+
+            // ================================================================================================
+            // You may get an Error (**) If your app targets API 24+
+            // "android.os.FileUriExposedException: file:///storage/emulated/0/xxx exposed beyond app through.."
+            //  Explanation: https://stackoverflow.com/questions/38200282
+            // ================================================================================================
+
+            // Start camera and wait for the results.
+            this.startActivityForResult(intent, REQUEST_ID_VIDEO_CAPTURE); // (**)
+
+        } catch(Exception e)  {
+            Toast.makeText(this, "Error capture video: " +e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_CAMERA) {
@@ -88,3 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 }
+// mipmap roltai
+// chụp xong chọn liền dùng teckistoam bat to
+// xin quyen it pasksanggraw
